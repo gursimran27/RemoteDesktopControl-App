@@ -7,7 +7,7 @@ const screenshot = require("screenshot-desktop");
 var robot = require("robotjs");
 
 var socket = require("socket.io-client")(
-  "http://localhost:5000/"
+  "https://remotedesktopcontrol-app.onrender.com/"
 );
 var interval;
 let uuid;
