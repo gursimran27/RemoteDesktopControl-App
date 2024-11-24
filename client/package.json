@@ -1,0 +1,43 @@
+{
+  "name": "screen-share-app",
+  "version": "1.0.0",
+  "description": "A simple screen share application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "author": "Gursimran",
+  "license": "ISC",
+  "dependencies": {
+    "screenshot-desktop": "^1.15.0",
+    "socket.io-client": "^4.8.1",
+    "uuid": "^11.0.3"
+  },
+  "devDependencies": {
+    "electron": "^17.4.11",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.example.screenShareApp",
+    "productName": "Screen Share App",
+    "files": [
+      "**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": true
+    },
+    "asarUnpack": [
+      "node_modules/screenshot-desktop/**/*",
+      "node_modules/robotjs/**/*"
+    ]
+  }
+}

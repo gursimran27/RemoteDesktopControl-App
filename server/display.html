@@ -1,0 +1,102 @@
+<html lang="en">
+  <head>
+    <title>Screecast Viewer</title>
+    <style>
+      body {
+        background: linear-gradient(45deg, #7b0909, #6771b8b8);
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain; /* Ensures the aspect ratio is maintained */
+      }
+    </style>
+  </head>
+  <body>
+    <img />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      let remoteUserScreenSize = null;
+      window.onload = function () {
+        var room = prompt("Please enter room ID : ");
+        // Check if the user clicked Cancel or left the input empty
+
+        if (room === null) {
+          window.location.href = "http://localhost:5000/";
+          return;
+        }
+
+        if (room.trim().length == 0) {
+          alert("Room ID is mandatory to join");
+          window.location.href = "http://localhost:5000/";
+          return;
+        }
+
+        socket = io.connect("http://localhost:5000/");
+
+        socket.emit("join-message", room);
+        socket.on("screen-data", function (imgStr, remoteScreenSize) {
+          $("img").attr("src", "data:image/png;base64," + imgStr); //this is jQuery
+          if (remoteUserScreenSize == null) {
+            remoteUserScreenSize = remoteScreenSize;
+          }
+          console.log("remoteUserScreenSize = " + remoteUserScreenSize); 
+        });
+        socket.on("end-session", function () {
+          alert("session ended😊");
+          window.location.href = "http://localhost:5000/";
+        });
+
+        $("img").mousemove(function (event) {
+          const $img = $(this); // Use the current image being hovered over
+          const renderedImageSize = $img[0].getBoundingClientRect(); // Get image dimensions
+
+          // Calculate cursor position relative to the image
+          const cursorX = event.clientX - renderedImageSize.left;
+          const cursorY = event.clientY - renderedImageSize.top;
+
+          // Ensure `remoteUserScreenSize` is defined and holds the remote screen dimensions
+          const scaleX = remoteUserScreenSize.width / renderedImageSize.width;
+          const scaleY = remoteUserScreenSize.height / renderedImageSize.height;
+
+          // Map the cursor position to remote screen coordinates
+          const remoteX = cursorX * scaleX;
+          const remoteY = cursorY * scaleY;
+
+          // Prepare data object to send
+          const obj = { x: remoteX, y: remoteY, room: room };
+
+          // Emit the mouse movement event via socket
+          socket.emit("mouse-move", JSON.stringify(obj));
+
+          // Optional: Log for debugging
+          // console.log("Remote Coordinates:", obj);
+        });
+
+        $("img").click(function (e) {
+          var obj = { room: room };
+          socket.emit("mouse-click", JSON.stringify(obj));
+        });
+
+        $(window).bind("keyup", function (e) {
+          var obj = { key: e.key, room: room };
+          socket.emit("type", JSON.stringify(obj));
+        });
+      };
+    </script>
+  </body>
+</html>
