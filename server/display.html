@@ -10,12 +10,16 @@
         justify-content: center;
         align-items: center;
         height: 100vh;
+        width: 100vw;
         overflow: hidden;
       }
 
       img {
-        max-width: 100%;
-        max-height: 100%;
+        width: 1400px;
+        height: 640px;
+        border: 1px solid white;
+        /* max-width: 100%;
+        max-height: 100%; */
         object-fit: contain; /* Ensures the aspect ratio is maintained */
       }
     </style>
@@ -67,7 +71,7 @@
         $("img").mousemove(function (event) {
           const $img = $(this); // Use the current image being hovered over
           const renderedImageSize = $img[0].getBoundingClientRect(); // Get image dimensions
-
+          console.log(renderedImageSize);
           // Calculate cursor position relative to the image
           const cursorX = event.clientX - renderedImageSize.left;
           const cursorY = event.clientY - renderedImageSize.top;
