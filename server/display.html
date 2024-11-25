@@ -76,9 +76,19 @@
           const scaleX = remoteUserScreenSize.width / renderedImageSize.width;
           const scaleY = remoteUserScreenSize.height / renderedImageSize.height;
 
+          // If the sharer's screen is smaller, apply a scale-down factor
+          const scaleXFinal =
+            remoteUserScreenSize.width < renderedImageSize.width
+              ? 1 / scaleX
+              : scaleX;
+          const scaleYFinal =
+            remoteUserScreenSize.height < renderedImageSize.height
+              ? 1 / scaleY
+              : scaleY;
+
           // Map the cursor position to remote screen coordinates
-          const remoteX = cursorX * scaleX;
-          const remoteY = cursorY * scaleY;
+          const remoteX = cursorX * scaleXFinal;
+          const remoteY = cursorY * scaleYFinal;
 
           const viewerScreenSize = {
             width: window.innerWidth,
@@ -101,11 +111,13 @@
         });
 
         $("img").click(function (e) {
+          e.preventDefault();
           const obj = { room: room, type: "single-click" };
           socket.emit("mouse-click", JSON.stringify(obj));
         });
 
         $("img").dblclick(function (e) {
+          e.preventDefault();
           const obj = { room: room, type: "double-click" };
           socket.emit("mouse-click", JSON.stringify(obj));
         });
@@ -117,6 +129,8 @@
         });
 
         $(window).bind("keyup", function (e) {
+          e.preventDefault();
+
           const keyMapping = {
             Backspace: "backspace",
             Enter: "enter",
@@ -154,9 +168,48 @@
             Pause: "pause",
             PrintScreen: "printscreen",
             Windows: "windows",
+            ScrollUp: "scrollUp",
+            ScrollDown: "scrollDown",
+            CtrlC: ["ctrl", "c"], // Adding Ctrl + C combination
+            CtrlV: ["ctrl", "v"], // Adding Ctrl + V combination
+            CtrlA: ["ctrl", "a"], // Ctrl + A (select all)
+            CtrlX: ["ctrl", "x"], // Ctrl + X (cut)
+            CtrlZ: ["ctrl", "z"], // Ctrl + Z (undo)
+            CtrlY: ["ctrl", "y"], // Ctrl + Y (redo)
+            CtrlS: ["ctrl", "s"], // Ctrl + S (save)
+            CtrlP: ["ctrl", "p"], // Ctrl + P (print)
+            CtrlN: ["ctrl", "n"], // Ctrl + N (new window)
+            CtrlShiftN: ["ctrl", "shift", "n"], // Ctrl + Shift + N (new incognito window in Chrome)
+            CtrlShiftT: ["ctrl", "shift", "t"], // Ctrl + Shift + T (reopen last closed tab)
+            AltF4: ["alt", "f4"], // Alt + F4 (close window)
+            CtrlAltDelete: ["ctrl", "alt", "delete"], // Ctrl + Alt + Delete (Windows task manager)
+            AltTab: ["alt", "tab"], // Alt + Tab (switch windows)
+            AltShiftTab: ["alt", "shift", "tab"], // Alt + Shift + Tab (reverse window switch)
+            CtrlShiftEsc: ["ctrl", "shift", "esc"], // Ctrl + Shift + Esc (open task manager)
+            CtrlAltEsc: ["ctrl", "alt", "esc"], // Ctrl + Alt + Esc (open task manager)
+            CtrlShiftS: ["ctrl", "shift", "s"], // Ctrl + Shift + S (save as)
+            CtrlShiftE: ["ctrl", "shift", "e"], // Ctrl + Shift + E (open explorer in some apps)
+            F5: ["f5"], // F5 (refresh)
+            CtrlR: ["ctrl", "r"], // Ctrl + R (reload)
+            CtrlShiftR: ["ctrl", "shift", "r"], // Ctrl + Shift + R (force reload)
+            AltEnter: ["alt", "enter"], // Alt + Enter (toggle fullscreen)
+            CtrlAltF4: ["ctrl", "alt", "f4"], // Ctrl + Alt + F4 (close some apps)
+            WinR: ["windows", "r"], // Win + R (run dialog)
+            WinD: ["windows", "d"], // Win + D (show desktop)
+            WinE: ["windows", "e"], // Win + E (open Explorer)
+            WinL: ["windows", "l"], // Win + L (lock the computer)
+            WinM: ["windows", "m"], // Win + M (minimize all windows)
+            WinShiftM: ["windows", "shift", "m"], // Win + Shift + M (restore minimized windows)
+            WinP: ["windows", "p"], // Win + P (project)
+            WinTab: ["windows", "tab"], // Win + Tab (task view)
+            AltF1: ["alt", "f1"], // Alt + F1 (Windows Start menu)
+            AltF2: ["alt", "f2"], // Alt + F2 (macOS app switcher)
+            CtrlAltF: ["ctrl", "alt", "f"], // Ctrl + Alt + F (focus window)
+            CtrlShiftQ: ["ctrl", "shift", "q"], // Ctrl + Shift + Q (log out)
           };
+
           let key = e.key;
-          
+
           // If the key is alphanumeric (letters or digits), convert it to lowercase
           if (/[a-zA-Z0-9]/.test(key)) {
             key = key.toLowerCase();
