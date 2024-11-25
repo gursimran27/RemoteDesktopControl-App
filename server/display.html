@@ -76,30 +76,14 @@
           const scaleX = remoteUserScreenSize.width / renderedImageSize.width;
           const scaleY = remoteUserScreenSize.height / renderedImageSize.height;
 
-          // If the sharer's screen is smaller, apply a scale-down factor
-          const scaleXFinal =
-            remoteUserScreenSize.width < renderedImageSize.width
-              ? 1 / scaleX
-              : scaleX;
-          const scaleYFinal =
-            remoteUserScreenSize.height < renderedImageSize.height
-              ? 1 / scaleY
-              : scaleY;
-
           // Map the cursor position to remote screen coordinates
-          const remoteX = cursorX * scaleXFinal;
-          const remoteY = cursorY * scaleYFinal;
-
-          const viewerScreenSize = {
-            width: window.innerWidth,
-            height: window.innerHeight,
-          };
+          const remoteX = cursorX * scaleX;
+          const remoteY = cursorY * scaleY;
 
           // Prepare data object to send
           const obj = {
             x: remoteX,
             y: remoteY,
-            viewerScreenSize,
             room: room,
           };
 
