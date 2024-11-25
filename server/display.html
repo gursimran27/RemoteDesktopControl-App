@@ -36,13 +36,15 @@
         // Check if the user clicked Cancel or left the input empty
 
         if (room === null) {
-          window.location.href = "https://remotedesktopcontrol-app.onrender.com/";
+          window.location.href =
+            "https://remotedesktopcontrol-app.onrender.com/";
           return;
         }
 
         if (room.trim().length == 0) {
           alert("Room ID is mandatory to join");
-          window.location.href = "https://remotedesktopcontrol-app.onrender.com/";
+          window.location.href =
+            "https://remotedesktopcontrol-app.onrender.com/";
           return;
         }
 
@@ -54,11 +56,12 @@
           if (remoteUserScreenSize == null) {
             remoteUserScreenSize = remoteScreenSize;
           }
-          console.log("remoteUserScreenSize = " + remoteUserScreenSize); 
+          console.log("remoteUserScreenSize = " + remoteUserScreenSize);
         });
         socket.on("end-session", function () {
           alert("session ended😊");
-          window.location.href = "https://remotedesktopcontrol-app.onrender.com/";
+          window.location.href =
+            "https://remotedesktopcontrol-app.onrender.com/";
         });
 
         $("img").mousemove(function (event) {
@@ -77,8 +80,18 @@
           const remoteX = cursorX * scaleX;
           const remoteY = cursorY * scaleY;
 
+          const viewerScreenSize = {
+            width: window.innerWidth,
+            height: window.innerHeight,
+          };
+
           // Prepare data object to send
-          const obj = { x: remoteX, y: remoteY, room: room };
+          const obj = {
+            x: remoteX,
+            y: remoteY,
+            viewerScreenSize,
+            room: room,
+          };
 
           // Emit the mouse movement event via socket
           socket.emit("mouse-move", JSON.stringify(obj));
@@ -88,12 +101,71 @@
         });
 
         $("img").click(function (e) {
-          var obj = { room: room };
+          const obj = { room: room, type: "single-click" };
+          socket.emit("mouse-click", JSON.stringify(obj));
+        });
+
+        $("img").dblclick(function (e) {
+          const obj = { room: room, type: "double-click" };
+          socket.emit("mouse-click", JSON.stringify(obj));
+        });
+
+        $("img").contextmenu(function (e) {
+          e.preventDefault(); // Prevent the default context menu from appearing
+          const obj = { room: room, type: "right-click" };
           socket.emit("mouse-click", JSON.stringify(obj));
         });
 
         $(window).bind("keyup", function (e) {
-          var obj = { key: e.key, room: room };
+          const keyMapping = {
+            Backspace: "backspace",
+            Enter: "enter",
+            Shift: "shift",
+            Control: "ctrl",
+            Alt: "alt",
+            CapsLock: "capslock",
+            Space: "space",
+            ArrowUp: "up",
+            ArrowDown: "down",
+            ArrowLeft: "left",
+            ArrowRight: "right",
+            Esc: "escape",
+            Tab: "tab",
+            Delete: "delete",
+            Insert: "insert",
+            Home: "home",
+            End: "end",
+            PageUp: "pageup",
+            PageDown: "pagedown",
+            F1: "f1",
+            F2: "f2",
+            F3: "f3",
+            F4: "f4",
+            F5: "f5",
+            F6: "f6",
+            F7: "f7",
+            F8: "f8",
+            F9: "f9",
+            F10: "f10",
+            F11: "f11",
+            F12: "f12",
+            NumLock: "numlock",
+            ScrollLock: "scrolllock",
+            Pause: "pause",
+            PrintScreen: "printscreen",
+            Windows: "windows",
+          };
+          let key = e.key;
+          
+          // If the key is alphanumeric (letters or digits), convert it to lowercase
+          if (/[a-zA-Z0-9]/.test(key)) {
+            key = key.toLowerCase();
+          }
+
+          // Map special keys
+          key = keyMapping[key] || key; // Use the keyMapping for special keys or the regular key
+
+          var obj = { key: key, room: room };
           socket.emit("type", JSON.stringify(obj));
         });
       };
