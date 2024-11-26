@@ -25,9 +25,7 @@
     </style>
   </head>
   <body>
-    <img
-      src="https://th.bing.com/th/id/OIP.GvntOdvz80txbfbW4rz2kAHaEo?rs=1&pid=ImgDetMain"
-    />
+    <img />
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script
@@ -36,36 +34,7 @@
     ></script>
 
     <script>
-      
       let remoteUserScreenSize = null;
-
-      function adjustImageSize() {
-        const $body = $("body");
-        const $img = $("img");
-
-        const bodyWidth = $body.width();
-        const bodyHeight = $body.height();
-
-        const aspectRatio =
-          remoteUserScreenSize.width / remoteUserScreenSize.height;
-
-        let imgWidth, imgHeight;
-
-        if (bodyWidth / bodyHeight > aspectRatio) {
-          // Body is wider than aspect ratio; match height
-          imgHeight = bodyHeight;
-          imgWidth = imgHeight * aspectRatio;
-        } else {
-          // Body is taller than aspect ratio; match width
-          imgWidth = bodyWidth;
-          imgHeight = imgWidth / aspectRatio;
-        }
-
-        $img.css({
-          width: `${imgWidth}px`,
-          height: `${imgHeight}px`,
-        });
-      }
 
       window.onload = function () {
         var room = prompt("Please enter room ID : ");
@@ -91,7 +60,6 @@
           $("img").attr("src", "data:image/png;base64," + imgStr); //this is jQuery
           if (remoteUserScreenSize === null) {
             remoteUserScreenSize = remoteScreenSize;
-            adjustImageSize();
           }
           // console.log("remoteUserScreenSize = " + remoteUserScreenSize);
         });
@@ -114,21 +82,33 @@
           const scaleY = remoteUserScreenSize.height / renderedImageSize.height;
 
           // Map the cursor position to remote screen coordinates
-          const remoteX = cursorX * scaleX;
-          const remoteY = cursorY * scaleY;
+          const remoteX = Math.round(cursorX * scaleX);
+          const remoteY = Math.round(cursorY * scaleY);
+
+          if (
+            remoteX >= 0 &&
+            remoteX <= remoteUserScreenSize.width &&
+            remoteY >= 0 &&
+            remoteY <= remoteUserScreenSize.height
+          ) {
+            const obj = {
+              x: remoteX,
+              y: remoteY,
+              room: room,
+            };
+
+            socket.emit("mouse-move", JSON.stringify(obj));
+          }
 
           // Prepare data object to send
-          const obj = {
-            x: remoteX,
-            y: remoteY,
-            room: room,
-          };
+          // const obj = {
+          //   x: remoteX,
+          //   y: remoteY,
+          //   room: room,
+          // };
 
-          // Emit the mouse movement event via socket
-          socket.emit("mouse-move", JSON.stringify(obj));
-
-          // Optional: Log for debugging
-          // console.log("Remote Coordinates:", obj);
+          // // Emit the mouse movement event via socket
+          // socket.emit("mouse-move", JSON.stringify(obj));
         });
 
         $("img").click(function (e) {
