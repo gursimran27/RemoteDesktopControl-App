@@ -74,41 +74,44 @@
           const renderedImageSize = $img[0].getBoundingClientRect(); // Get image dimensions
 
           // Calculate cursor position relative to the image
-          const cursorX = event.clientX - renderedImageSize.left;
-          const cursorY = event.clientY - renderedImageSize.top;
+          const cursorX = (event.clientX - renderedImageSize.left) / renderedImageSize.width * 100;
+          const cursorY = (event.clientY - renderedImageSize.top) / renderedImageSize.height * 100;
+
+          const remoteX = cursorX / 100 * remoteUserScreenSize.width;
+          const remoteY = cursorY / 100 * remoteUserScreenSize.height;
 
           // Ensure `remoteUserScreenSize` is defined and holds the remote screen dimensions
-          const scaleX = remoteUserScreenSize.width / renderedImageSize.width;
-          const scaleY = remoteUserScreenSize.height / renderedImageSize.height;
+          // const scaleX = remoteUserScreenSize.width / renderedImageSize.width;
+          // const scaleY = remoteUserScreenSize.height / renderedImageSize.height;
 
           // Map the cursor position to remote screen coordinates
-          const remoteX = Math.round(cursorX * scaleX);
-          const remoteY = Math.round(cursorY * scaleY);
+          // const remoteX = Math.round(cursorX * scaleX);
+          // const remoteY = Math.round(cursorY * scaleY);
 
-          if (
-            remoteX >= 0 &&
-            remoteX <= remoteUserScreenSize.width &&
-            remoteY >= 0 &&
-            remoteY <= remoteUserScreenSize.height
-          ) {
-            const obj = {
-              x: remoteX,
-              y: remoteY,
-              room: room,
-            };
+          // if (
+          //   remoteX >= 0 &&
+          //   remoteX <= remoteUserScreenSize.width &&
+          //   remoteY >= 0 &&
+          //   remoteY <= remoteUserScreenSize.height
+          // ) {
+          //   const obj = {
+          //     x: remoteX,
+          //     y: remoteY,
+          //     room: room,
+          //   };
 
-            socket.emit("mouse-move", JSON.stringify(obj));
-          }
+          //   socket.emit("mouse-move", JSON.stringify(obj));
+          // }
 
           // Prepare data object to send
-          // const obj = {
-          //   x: remoteX,
-          //   y: remoteY,
-          //   room: room,
-          // };
+          const obj = {
+            x: remoteX,
+            y: remoteY,
+            room: room,
+          };
 
-          // // Emit the mouse movement event via socket
-          // socket.emit("mouse-move", JSON.stringify(obj));
+          // Emit the mouse movement event via socket
+          socket.emit("mouse-move", JSON.stringify(obj));
         });
 
         $("img").click(function (e) {
