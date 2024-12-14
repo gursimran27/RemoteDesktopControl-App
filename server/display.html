@@ -52,7 +52,6 @@
             "https://remotedesktopcontrol-app.onrender.com/";
           return;
         }
-
         socket = io.connect("https://remotedesktopcontrol-app.onrender.com/");
 
         socket.emit("join-message", room);

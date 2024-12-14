@@ -1,7 +1,7 @@
 {
-  "name": "screen-share-app",
+  "name": "remote-desktop-control-app",
   "version": "1.0.0",
-  "description": "A simple screen share application",
+  "description": "remote-desktop-control-app",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -10,6 +10,7 @@
   "author": "Gursimran",
   "license": "ISC",
   "dependencies": {
+    "robotjs": "^0.6.0",
     "screenshot-desktop": "^1.15.0",
     "socket.io-client": "^4.8.1",
     "uuid": "^11.0.3"
@@ -19,8 +20,8 @@
     "electron-builder": "^25.1.8"
   },
   "build": {
-    "appId": "com.example.screenShareApp",
-    "productName": "Screen Share App",
+    "appId": "com.exampleremoteDesktopControlApp",
+    "productName": "remote desktop control App",
     "files": [
       "**/*"
     ],
@@ -36,8 +37,10 @@
       "deleteAppDataOnUninstall": true
     },
     "asarUnpack": [
-      "node_modules/screenshot-desktop/**/*",
-      "node_modules/robotjs/**/*"
+      "node_modules/screenshot-desktop/**/*"
+    ],
+    "extraResources": [
+      "node_modules/robotjs/build/Release/robotjs.node"
     ]
   }
 }

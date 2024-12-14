@@ -12,6 +12,13 @@ var socket = require("socket.io-client")(
 var interval;
 let uuid;
 
+// Pressing a combination of keys
+function pressKeyCombination(keys) {
+  keys.forEach((key) => robot.keyToggle(key, "down")); // Hold down all keys in combination
+  keys.forEach((key) => robot.keyTap(key)); // Tap each key
+  keys.forEach((key) => robot.keyToggle(key, "up")); // Release all keys
+}
+
 const createWindow = () => {
   // Create the browser window.
   const win = new BrowserWindow({
@@ -30,25 +37,162 @@ const createWindow = () => {
   win.loadFile("./index.html");
 
   // Open the DevTools.
-  // win.webContents.openDevTools()
+  win.webContents.openDevTools();
 
   socket.on("mouse-move", function (data) {
-    var obj = JSON.parse(data);
-    var x = obj.x;
-    var y = obj.y;
+    const obj = JSON.parse(data);
 
-    robot.moveMouse(x, y);
+    // const primaryDisplay = screen.getPrimaryDisplay();
+    // const hostScreen = primaryDisplay.size;
+
+    // const x = Math.min(Math.max(0, obj.x), hostScreen.width);
+    // const y = Math.min(Math.max(0, obj.y), hostScreen.height);
+
+    robot.moveMouse(obj.x, obj.y);
   });
 
   socket.on("mouse-click", function (data) {
-    robot.mouseClick();
+    const obj = JSON.parse(data);
+
+    if (obj.type === "single-click") {
+      robot.mouseClick();
+    } else if (obj.type === "double-click") {
+      robot.mouseClick("left", true);
+    } else if (obj.type === "right-click") {
+      robot.mouseClick("right");
+    }
   });
 
   socket.on("type", function (data) {
-    var obj = JSON.parse(data);
-    var key = obj.key;
+    const obj = JSON.parse(data);
+    let key = obj.key;
 
-    robot.keyTap(key.toString());
+    // Handle special keys using keyMapping
+    if (Array.isArray(key)) {
+      // If it's an array of keys (like "Ctrl + C"), call pressKeys
+      pressKeyCombination(key);
+    } else {
+      // Handle single key presses
+      switch (key) {
+        case "backspace":
+          robot.keyTap("backspace");
+          break;
+        case "enter":
+          robot.keyTap("enter");
+          break;
+        case "shift":
+          robot.keyTap("shift");
+          break;
+        case "ctrl":
+          robot.keyTap("control");
+          break;
+        case "alt":
+          robot.keyTap("alt");
+          break;
+        case "capslock":
+          robot.keyTap("capslock");
+          break;
+        case "space":
+          robot.keyTap("space");
+          break;
+        case "escape":
+          robot.keyTap("escape");
+          break;
+        case "tab":
+          robot.keyTap("tab");
+          break;
+        case "delete":
+          robot.keyTap("delete");
+          break;
+        case "insert":
+          robot.keyTap("insert");
+          break;
+        case "home":
+          robot.keyTap("home");
+          break;
+        case "end":
+          robot.keyTap("end");
+          break;
+        case "pageup":
+          robot.keyTap("pageup");
+          break;
+        case "pagedown":
+          robot.keyTap("pagedown");
+          break;
+        case "f1":
+          robot.keyTap("f1");
+          break;
+        case "f2":
+          robot.keyTap("f2");
+          break;
+        case "f3":
+          robot.keyTap("f3");
+          break;
+        case "f4":
+          robot.keyTap("f4");
+          break;
+        case "f5":
+          robot.keyTap("f5");
+          break;
+        case "f6":
+          robot.keyTap("f6");
+          break;
+        case "f7":
+          robot.keyTap("f7");
+          break;
+        case "f8":
+          robot.keyTap("f8");
+          break;
+        case "f9":
+          robot.keyTap("f9");
+          break;
+        case "f10":
+          robot.keyTap("f10");
+          break;
+        case "f11":
+          robot.keyTap("f11");
+          break;
+        case "f12":
+          robot.keyTap("f12");
+          break;
+        case "numlock":
+          robot.keyTap("numlock");
+          break;
+        case "scrolllock":
+          robot.keyTap("scrolllock");
+          break;
+        case "pause":
+          robot.keyTap("pause");
+          break;
+        case "printscreen":
+          robot.keyTap("printscreen");
+          break;
+        case "windows":
+          robot.keyTap("meta"); // Windows key on macOS or equivalent
+          break;
+        case "scrollUp":
+          robot.scroll(0, -20); // Scroll up
+          break;
+        case "scrollDown":
+          robot.scroll(0, 20); // Scroll down
+          break;
+        case "up":
+          robot.keyTap("up"); // Arrow up
+          break;
+        case "down":
+          robot.keyTap("down"); // Arrow down
+          break;
+        case "left":
+          robot.keyTap("left"); // Arrow left
+          break;
+        case "right":
+          robot.keyTap("right"); // Arrow right
+          break;
+
+        default:
+          robot.keyTap(key.toString()); // For regular alphanumeric keys
+      }
+    }
   });
 };
 
@@ -78,6 +222,12 @@ ipcMain.on("start-share", function (event, arg) {
   event.reply("uuid", uuid);
 
   const remoteScreenSize = screen.getPrimaryDisplay().size;
+  const scaleFactor = screen.getPrimaryDisplay().scaleFactor;
+  const actualSize = {
+    width: remoteScreenSize.width * scaleFactor,
+    height: remoteScreenSize.height * scaleFactor,
+  }
+  console.log(actualSize,screen.getPrimaryDisplay());
 
   interval = setInterval(function () {
     // console.log("Interval triggered"); //print in VsCode termical not console
@@ -88,7 +238,7 @@ ipcMain.on("start-share", function (event, arg) {
         var obj = {};
         obj.room = uuid;
         obj.image = imgStr;
-        obj.remoteScreenSize = remoteScreenSize;
+        obj.remoteScreenSize = actualSize;
 
         socket.emit("screen-data", JSON.stringify(obj));
       })
