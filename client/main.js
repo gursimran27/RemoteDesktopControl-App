@@ -13,11 +13,11 @@ var interval;
 let uuid;
 
 // Pressing a combination of keys
-function pressKeyCombination(keys) {
-  keys.forEach((key) => robot.keyToggle(key, "down")); // Hold down all keys in combination
-  keys.forEach((key) => robot.keyTap(key)); // Tap each key
-  keys.forEach((key) => robot.keyToggle(key, "up")); // Release all keys
-}
+// function pressKeyCombination(keys) {
+//   keys.forEach((key) => robot.keyToggle(key, "down")); // Hold down all keys in combination
+//   keys.forEach((key) => robot.keyTap(key)); // Tap each key
+//   keys.forEach((key) => robot.keyToggle(key, "up")); // Release all keys
+// }
 
 const createWindow = () => {
   // Create the browser window.
@@ -41,13 +41,6 @@ const createWindow = () => {
 
   socket.on("mouse-move", function (data) {
     const obj = JSON.parse(data);
-
-    // const primaryDisplay = screen.getPrimaryDisplay();
-    // const hostScreen = primaryDisplay.size;
-
-    // const x = Math.min(Math.max(0, obj.x), hostScreen.width);
-    // const y = Math.min(Math.max(0, obj.y), hostScreen.height);
-
     robot.moveMouse(obj.x, obj.y);
   });
 
@@ -63,135 +56,137 @@ const createWindow = () => {
     }
   });
 
+  socket.on("mouse-scroll", function (data) {
+    const obj = JSON.parse(data);
+
+    if (obj.direction === "up") {
+      console.log("up");
+      robot.scrollMouse(0, -10);
+    } else {
+      console.log("up-reverse");
+      robot.scrollMouse(0, 10);
+    }
+  });
+
   socket.on("type", function (data) {
     const obj = JSON.parse(data);
     let key = obj.key;
+    console.log(key);
 
-    // Handle special keys using keyMapping
-    if (Array.isArray(key)) {
-      // If it's an array of keys (like "Ctrl + C"), call pressKeys
-      pressKeyCombination(key);
-    } else {
-      // Handle single key presses
-      switch (key) {
-        case "backspace":
-          robot.keyTap("backspace");
-          break;
-        case "enter":
-          robot.keyTap("enter");
-          break;
-        case "shift":
-          robot.keyTap("shift");
-          break;
-        case "ctrl":
-          robot.keyTap("control");
-          break;
-        case "alt":
-          robot.keyTap("alt");
-          break;
-        case "capslock":
-          robot.keyTap("capslock");
-          break;
-        case "space":
-          robot.keyTap("space");
-          break;
-        case "escape":
-          robot.keyTap("escape");
-          break;
-        case "tab":
-          robot.keyTap("tab");
-          break;
-        case "delete":
-          robot.keyTap("delete");
-          break;
-        case "insert":
-          robot.keyTap("insert");
-          break;
-        case "home":
-          robot.keyTap("home");
-          break;
-        case "end":
-          robot.keyTap("end");
-          break;
-        case "pageup":
-          robot.keyTap("pageup");
-          break;
-        case "pagedown":
-          robot.keyTap("pagedown");
-          break;
-        case "f1":
-          robot.keyTap("f1");
-          break;
-        case "f2":
-          robot.keyTap("f2");
-          break;
-        case "f3":
-          robot.keyTap("f3");
-          break;
-        case "f4":
-          robot.keyTap("f4");
-          break;
-        case "f5":
-          robot.keyTap("f5");
-          break;
-        case "f6":
-          robot.keyTap("f6");
-          break;
-        case "f7":
-          robot.keyTap("f7");
-          break;
-        case "f8":
-          robot.keyTap("f8");
-          break;
-        case "f9":
-          robot.keyTap("f9");
-          break;
-        case "f10":
-          robot.keyTap("f10");
-          break;
-        case "f11":
-          robot.keyTap("f11");
-          break;
-        case "f12":
-          robot.keyTap("f12");
-          break;
-        case "numlock":
-          robot.keyTap("numlock");
-          break;
-        case "scrolllock":
-          robot.keyTap("scrolllock");
-          break;
-        case "pause":
-          robot.keyTap("pause");
-          break;
-        case "printscreen":
-          robot.keyTap("printscreen");
-          break;
-        case "windows":
-          robot.keyTap("meta"); // Windows key on macOS or equivalent
-          break;
-        case "scrollUp":
-          robot.scroll(0, -20); // Scroll up
-          break;
-        case "scrollDown":
-          robot.scroll(0, 20); // Scroll down
-          break;
-        case "up":
-          robot.keyTap("up"); // Arrow up
-          break;
-        case "down":
-          robot.keyTap("down"); // Arrow down
-          break;
-        case "left":
-          robot.keyTap("left"); // Arrow left
-          break;
-        case "right":
-          robot.keyTap("right"); // Arrow right
-          break;
+    switch (key) {
+      case "backspace":
+        robot.keyTap("backspace");
+        break;
+      case "enter":
+        robot.keyTap("enter");
+        break;
+      case "shift":
+        robot.keyTap("shift");
+        break;
+      case "ctrl":
+        robot.keyTap("control");
+        break;
+      case "alt":
+        robot.keyTap("alt");
+        break;
+      case "capslock":
+        robot.keyTap("capslock");
+        break;
+      case "space":
+        robot.keyTap("space");
+        break;
+      case "escape":
+        robot.keyTap("escape");
+        break;
+      case "tab":
+        robot.keyTap("tab");
+        break;
+      case "delete":
+        robot.keyTap("delete");
+        break;
+      case "insert":
+        robot.keyTap("insert");
+        break;
+      case "home":
+        robot.keyTap("home");
+        break;
+      case "end":
+        robot.keyTap("end");
+        break;
+      case "pageup":
+        robot.keyTap("pageup");
+        break;
+      case "pagedown":
+        robot.keyTap("pagedown");
+        break;
+      case "f1":
+        robot.keyTap("f1");
+        break;
+      case "f2":
+        robot.keyTap("f2");
+        break;
+      case "f3":
+        robot.keyTap("f3");
+        break;
+      case "f4":
+        robot.keyTap("f4");
+        break;
+      case "f5":
+        robot.keyTap("f5");
+        break;
+      case "f6":
+        robot.keyTap("f6");
+        break;
+      case "f7":
+        robot.keyTap("f7");
+        break;
+      case "f8":
+        robot.keyTap("f8");
+        break;
+      case "f9":
+        robot.keyTap("f9");
+        break;
+      case "f10":
+        robot.keyTap("f10");
+        break;
+      case "f11":
+        robot.keyTap("f11");
+        break;
+      case "f12":
+        robot.keyTap("f12");
+        break;
+      case "numlock":
+        break;
+      case "pause":
+        robot.keyTap("pause");
+        break;
+      case "printscreen":
+        robot.keyTap("printscreen");
+        break;
+      case "windows":
+        robot.keyTap("meta"); // Windows key on macOS or equivalent
+        break;
+      case "arrowup":
+        robot.keyTap("up");
+        break;
+      case "arrowdown":
+        robot.keyTap("down"); 
+        break;
+      case "arrowleft":
+        robot.keyTap("left"); 
+        break;
+      case "arrowright":
+        robot.keyTap("right"); 
+        break;
+      case "scrolllock":
+        break;
 
-        default:
+      default:
+        try {
           robot.keyTap(key.toString()); // For regular alphanumeric keys
-      }
+        } catch (error) {
+          console.log("Error: " + error);
+        }
     }
   });
 };
@@ -226,8 +221,7 @@ ipcMain.on("start-share", function (event, arg) {
   const actualSize = {
     width: remoteScreenSize.width * scaleFactor,
     height: remoteScreenSize.height * scaleFactor,
-  }
-  // console.log(actualSize,screen.getPrimaryDisplay());
+  };
 
   interval = setInterval(function () {
     // console.log("Interval triggered"); //print in VsCode termical not console

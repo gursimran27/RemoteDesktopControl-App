@@ -15,17 +15,20 @@
       }
 
       img {
-        width: 1400px;
-        height: 640px;
+        width: 90vw;
+        height: 90vh;
+        /* width: 1400px; */
+        /* height: 640px; */
         border: 1px solid white;
         /* max-width: 100%; */
         /* max-height: 100%; */
-        /* object-fit: contain; */
+        /* object-fit: fill; */
+        user-select: none;
       }
     </style>
   </head>
   <body>
-    <img />
+    <img draggable="false" />
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script
@@ -38,7 +41,6 @@
 
       window.onload = function () {
         var room = prompt("Please enter room ID : ");
-        // Check if the user clicked Cancel or left the input empty
 
         if (room === null) {
           window.location.href =
@@ -60,7 +62,6 @@
           if (remoteUserScreenSize === null) {
             remoteUserScreenSize = remoteScreenSize;
           }
-          // console.log("remoteUserScreenSize = " + remoteUserScreenSize);
         });
         socket.on("end-session", function () {
           alert("session ended😊");
@@ -73,43 +74,24 @@
           const renderedImageSize = $img[0].getBoundingClientRect(); // Get image dimensions
 
           // Calculate cursor position relative to the image
-          const cursorX = (event.clientX - renderedImageSize.left) / renderedImageSize.width * 100;
-          const cursorY = (event.clientY - renderedImageSize.top) / renderedImageSize.height * 100;
+          const cursorX =
+            ((event.clientX - renderedImageSize.left) /
+              renderedImageSize.width) *
+            100;
+          const cursorY =
+            ((event.clientY - renderedImageSize.top) /
+              renderedImageSize.height) *
+            100;
 
-          const remoteX = cursorX / 100 * remoteUserScreenSize.width;
-          const remoteY = cursorY / 100 * remoteUserScreenSize.height;
+          const remoteX = (cursorX / 100) * remoteUserScreenSize.width;
+          const remoteY = (cursorY / 100) * remoteUserScreenSize.height;
 
-          // Ensure `remoteUserScreenSize` is defined and holds the remote screen dimensions
-          // const scaleX = remoteUserScreenSize.width / renderedImageSize.width;
-          // const scaleY = remoteUserScreenSize.height / renderedImageSize.height;
-
-          // Map the cursor position to remote screen coordinates
-          // const remoteX = Math.round(cursorX * scaleX);
-          // const remoteY = Math.round(cursorY * scaleY);
-
-          // if (
-          //   remoteX >= 0 &&
-          //   remoteX <= remoteUserScreenSize.width &&
-          //   remoteY >= 0 &&
-          //   remoteY <= remoteUserScreenSize.height
-          // ) {
-          //   const obj = {
-          //     x: remoteX,
-          //     y: remoteY,
-          //     room: room,
-          //   };
-
-          //   socket.emit("mouse-move", JSON.stringify(obj));
-          // }
-
-          // Prepare data object to send
           const obj = {
             x: remoteX,
             y: remoteY,
             room: room,
           };
 
-          // Emit the mouse movement event via socket
           socket.emit("mouse-move", JSON.stringify(obj));
         });
 
@@ -126,9 +108,18 @@
         });
 
         $("img").contextmenu(function (e) {
-          e.preventDefault(); // Prevent the default context menu from appearing
+          e.preventDefault();
           const obj = { room: room, type: "right-click" };
           socket.emit("mouse-click", JSON.stringify(obj));
+        });
+
+        $("img").on("wheel", function (e) {
+          e.preventDefault();
+
+          let direction = e.originalEvent.deltaY > 0 ? "down" : "up";
+          const obj = { room: room, type: "scroll", direction: direction };
+
+          socket.emit("mouse-scroll", JSON.stringify(obj));
         });
 
         $(window).bind("keyup", function (e) {
@@ -146,7 +137,7 @@
             ArrowDown: "down",
             ArrowLeft: "left",
             ArrowRight: "right",
-            Esc: "escape",
+            Escape: "escape",
             Tab: "tab",
             Delete: "delete",
             Insert: "insert",
@@ -171,44 +162,6 @@
             Pause: "pause",
             PrintScreen: "printscreen",
             Windows: "windows",
-            ScrollUp: "scrollUp",
-            ScrollDown: "scrollDown",
-            CtrlC: ["ctrl", "c"], // Adding Ctrl + C combination
-            CtrlV: ["ctrl", "v"], // Adding Ctrl + V combination
-            CtrlA: ["ctrl", "a"], // Ctrl + A (select all)
-            CtrlX: ["ctrl", "x"], // Ctrl + X (cut)
-            CtrlZ: ["ctrl", "z"], // Ctrl + Z (undo)
-            CtrlY: ["ctrl", "y"], // Ctrl + Y (redo)
-            CtrlS: ["ctrl", "s"], // Ctrl + S (save)
-            CtrlP: ["ctrl", "p"], // Ctrl + P (print)
-            CtrlN: ["ctrl", "n"], // Ctrl + N (new window)
-            CtrlShiftN: ["ctrl", "shift", "n"], // Ctrl + Shift + N (new incognito window in Chrome)
-            CtrlShiftT: ["ctrl", "shift", "t"], // Ctrl + Shift + T (reopen last closed tab)
-            AltF4: ["alt", "f4"], // Alt + F4 (close window)
-            CtrlAltDelete: ["ctrl", "alt", "delete"], // Ctrl + Alt + Delete (Windows task manager)
-            AltTab: ["alt", "tab"], // Alt + Tab (switch windows)
-            AltShiftTab: ["alt", "shift", "tab"], // Alt + Shift + Tab (reverse window switch)
-            CtrlShiftEsc: ["ctrl", "shift", "esc"], // Ctrl + Shift + Esc (open task manager)
-            CtrlAltEsc: ["ctrl", "alt", "esc"], // Ctrl + Alt + Esc (open task manager)
-            CtrlShiftS: ["ctrl", "shift", "s"], // Ctrl + Shift + S (save as)
-            CtrlShiftE: ["ctrl", "shift", "e"], // Ctrl + Shift + E (open explorer in some apps)
-            F5: ["f5"], // F5 (refresh)
-            CtrlR: ["ctrl", "r"], // Ctrl + R (reload)
-            CtrlShiftR: ["ctrl", "shift", "r"], // Ctrl + Shift + R (force reload)
-            AltEnter: ["alt", "enter"], // Alt + Enter (toggle fullscreen)
-            CtrlAltF4: ["ctrl", "alt", "f4"], // Ctrl + Alt + F4 (close some apps)
-            WinR: ["windows", "r"], // Win + R (run dialog)
-            WinD: ["windows", "d"], // Win + D (show desktop)
-            WinE: ["windows", "e"], // Win + E (open Explorer)
-            WinL: ["windows", "l"], // Win + L (lock the computer)
-            WinM: ["windows", "m"], // Win + M (minimize all windows)
-            WinShiftM: ["windows", "shift", "m"], // Win + Shift + M (restore minimized windows)
-            WinP: ["windows", "p"], // Win + P (project)
-            WinTab: ["windows", "tab"], // Win + Tab (task view)
-            AltF1: ["alt", "f1"], // Alt + F1 (Windows Start menu)
-            AltF2: ["alt", "f2"], // Alt + F2 (macOS app switcher)
-            CtrlAltF: ["ctrl", "alt", "f"], // Ctrl + Alt + F (focus window)
-            CtrlShiftQ: ["ctrl", "shift", "q"], // Ctrl + Shift + Q (log out)
           };
 
           let key = e.key;

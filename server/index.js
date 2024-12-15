@@ -27,20 +27,25 @@ io.on("connection", (socket) => {
     console.log("receiverd screen data");
   });
 
-  socket.on("mouse-move", function(data) {
-      var room = JSON.parse(data).room;
-      socket.broadcast.to(room).emit("mouse-move", data);
-  })
+  socket.on("mouse-move", function (data) {
+    var room = JSON.parse(data).room;
+    socket.broadcast.to(room).emit("mouse-move", data);
+  });
 
-  socket.on("mouse-click", function(data) {
-      var room = JSON.parse(data).room;
-      socket.broadcast.to(room).emit("mouse-click", data);
-  })
+  socket.on("mouse-click", function (data) {
+    var room = JSON.parse(data).room;
+    socket.broadcast.to(room).emit("mouse-click", data);
+  });
 
-  socket.on("type", function(data) {
-      var room = JSON.parse(data).room;
-      socket.broadcast.to(room).emit("type", data);
-  })
+  socket.on("mouse-scroll", function (data) {
+    var room = JSON.parse(data).room;
+    socket.broadcast.to(room).emit("mouse-scroll", data);
+  });
+
+  socket.on("type", function (data) {
+    var room = JSON.parse(data).room;
+    socket.broadcast.to(room).emit("type", data);
+  });
 
   socket.on("end-session", function (uuid) {
     socket.broadcast.to(uuid).emit("end-session");

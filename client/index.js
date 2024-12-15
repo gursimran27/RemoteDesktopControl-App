@@ -38,5 +38,5 @@ async function copyToClipboard() {
   }
   setTimeout(function () {
     document.getElementById("copy").innerText = "Copy";
-  }, 2000);
+  }, 1000);
 }
