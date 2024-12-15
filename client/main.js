@@ -37,7 +37,7 @@ const createWindow = () => {
   win.loadFile("./index.html");
 
   // Open the DevTools.
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
 
   socket.on("mouse-move", function (data) {
     const obj = JSON.parse(data);
@@ -227,7 +227,7 @@ ipcMain.on("start-share", function (event, arg) {
     width: remoteScreenSize.width * scaleFactor,
     height: remoteScreenSize.height * scaleFactor,
   }
-  console.log(actualSize,screen.getPrimaryDisplay());
+  // console.log(actualSize,screen.getPrimaryDisplay());
 
   interval = setInterval(function () {
     // console.log("Interval triggered"); //print in VsCode termical not console
