@@ -32,9 +32,14 @@ io.on("connection", (socket) => {
     socket.broadcast.to(room).emit("mouse-move", data);
   });
 
-  socket.on("mouse-click", function (data) {
+  // socket.on("mouse-click", function (data) {
+  //   var room = JSON.parse(data).room;
+  //   socket.broadcast.to(room).emit("mouse-click", data);
+  // });
+
+  socket.on("mouse-drag", function (data) {
     var room = JSON.parse(data).room;
-    socket.broadcast.to(room).emit("mouse-click", data);
+    socket.broadcast.to(room).emit("mouse-drag", data);
   });
 
   socket.on("mouse-scroll", function (data) {
