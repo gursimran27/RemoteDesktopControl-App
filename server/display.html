@@ -94,7 +94,7 @@
             isDragging: isDragging,
           };
 
-          // socket.emit("mouse-move", JSON.stringify(obj));
+          socket.emit("mouse-move", JSON.stringify(obj));
         });
 
         $("img").on("mousedown", function (e) {
