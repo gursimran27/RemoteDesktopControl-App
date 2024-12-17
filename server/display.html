@@ -44,16 +44,16 @@
         var room = prompt("Please enter session ID : ");
 
         if (room === null) {
-          window.location.href = "http://localhost:5000/";
+          window.location.href = "https://remotedesktopcontrol-app.onrender.com/";
           return;
         }
 
         if (room.trim().length == 0) {
           alert("Session ID is mandatory to join");
-          window.location.href = "http://localhost:5000/";
+          window.location.href = "https://remotedesktopcontrol-app.onrender.com/";
           return;
         }
-        socket = io.connect("http://localhost:5000/");
+        socket = io.connect("https://remotedesktopcontrol-app.onrender.com/");
 
         socket.emit("join-message", room);
         socket.on("screen-data", function (imgStr, remoteScreenSize) {
@@ -64,7 +64,7 @@
         });
         socket.on("end-session", function () {
           alert("session ended😊");
-          window.location.href = "http://localhost:5000/";
+          window.location.href = "https://remotedesktopcontrol-app.onrender.com/";
         });
 
         $("img").mousemove(function (event) {
