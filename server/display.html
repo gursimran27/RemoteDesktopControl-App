@@ -44,13 +44,15 @@
         var room = prompt("Please enter session ID : ");
 
         if (room === null) {
-          window.location.href = "https://remotedesktopcontrol-app.onrender.com/";
+          window.location.href =
+            "https://remotedesktopcontrol-app.onrender.com/";
           return;
         }
 
         if (room.trim().length == 0) {
           alert("Session ID is mandatory to join");
-          window.location.href = "https://remotedesktopcontrol-app.onrender.com/";
+          window.location.href =
+            "https://remotedesktopcontrol-app.onrender.com/";
           return;
         }
         socket = io.connect("https://remotedesktopcontrol-app.onrender.com/");
@@ -64,7 +66,8 @@
         });
         socket.on("end-session", function () {
           alert("session ended😊");
-          window.location.href = "https://remotedesktopcontrol-app.onrender.com/";
+          window.location.href =
+            "https://remotedesktopcontrol-app.onrender.com/";
         });
 
         $("img").mousemove(function (event) {
@@ -88,13 +91,14 @@
             x: remoteX,
             y: remoteY,
             room: room,
-            isDragging: isDragging
+            isDragging: isDragging,
           };
 
-          socket.emit("mouse-move", JSON.stringify(obj));
+          // socket.emit("mouse-move", JSON.stringify(obj));
         });
 
         $("img").on("mousedown", function (e) {
+          if (e.button !== 0) return; //mean not left mouseButton
           e.preventDefault();
           isDragging = true;
 
@@ -107,6 +111,7 @@
         });
 
         $("img").on("mouseup", function (e) {
+          if (e.button !== 0) return; //mean not left mouseButton
           e.preventDefault();
           isDragging = false;
 
@@ -124,13 +129,11 @@
         //   socket.emit("mouse-click", JSON.stringify(obj));
         // });
 
-        $("img").dblclick(function (e) {
-          console.log("mouseup");
-
-          e.preventDefault();
-          const obj = { room: room, type: "double-click" };
-          socket.emit("mouse-click", JSON.stringify(obj));
-        });
+        // $("img").dblclick(function (e) {
+        //   e.preventDefault();
+        //   const obj = { room: room, type: "double-click" };
+        //   socket.emit("mouse-click", JSON.stringify(obj));
+        // });
 
         $("img").contextmenu(function (e) {
           e.preventDefault();
