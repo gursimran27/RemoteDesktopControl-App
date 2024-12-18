@@ -41,7 +41,26 @@ const createWindow = () => {
 
   socket.on("mouse-move", function (data) {
     const obj = JSON.parse(data);
-    robot.moveMouse(obj.x, obj.y);
+    if (obj.isDragging) {
+      robot.dragMouse(obj.x, obj.y);
+    } else {
+      robot.moveMouse(obj.x, obj.y);
+    }
+  });
+
+  socket.on("mouse-drag", (data) => {
+    try {
+      const obj = JSON.parse(data);
+      const { type } = obj;
+
+      if (type === "mousedown") {
+        robot.mouseToggle("down"); // Press and hold the mouse button
+      } else if (type === "mouseup") {
+        robot.mouseToggle("up"); // Release the mouse button
+      }
+    } catch (err) {
+      console.error("Error handling mouse drag event:", err.message);
+    }
   });
 
   socket.on("mouse-click", function (data) {
@@ -57,136 +76,157 @@ const createWindow = () => {
   });
 
   socket.on("mouse-scroll", function (data) {
-    const obj = JSON.parse(data);
+    try {
+      const obj = JSON.parse(data);
 
-    if (obj.direction === "up") {
-      console.log("up");
-      robot.scrollMouse(0, -10);
-    } else {
-      console.log("up-reverse");
-      robot.scrollMouse(0, 10);
+      if (obj.direction === "up") {
+        console.log("Scrolling up");
+        robot.scrollMouse(0, -500); // Scroll up
+      } else {
+        console.log("Scrolling down");
+        robot.scrollMouse(0, 500); // Scroll down
+      }
+    } catch (err) {
+      console.error("Error in mouse scroll event:", err.message);
     }
   });
 
-  socket.on("type", function (data) {
-    const obj = JSON.parse(data);
-    let key = obj.key;
-    console.log(key);
+  // socket.on("type", function (data) {//old code
+  //   const obj = JSON.parse(data);
+  //   let key = obj.key;
+  //   console.log(key);
 
-    switch (key) {
-      case "backspace":
-        robot.keyTap("backspace");
-        break;
-      case "enter":
-        robot.keyTap("enter");
-        break;
-      case "shift":
-        robot.keyTap("shift");
-        break;
-      case "ctrl":
-        robot.keyTap("control");
-        break;
-      case "alt":
-        robot.keyTap("alt");
-        break;
-      case "capslock":
-        robot.keyTap("capslock");
-        break;
-      case "space":
-        robot.keyTap("space");
-        break;
-      case "escape":
-        robot.keyTap("escape");
-        break;
-      case "tab":
-        robot.keyTap("tab");
-        break;
-      case "delete":
-        robot.keyTap("delete");
-        break;
-      case "insert":
-        robot.keyTap("insert");
-        break;
-      case "home":
-        robot.keyTap("home");
-        break;
-      case "end":
-        robot.keyTap("end");
-        break;
-      case "pageup":
-        robot.keyTap("pageup");
-        break;
-      case "pagedown":
-        robot.keyTap("pagedown");
-        break;
-      case "f1":
-        robot.keyTap("f1");
-        break;
-      case "f2":
-        robot.keyTap("f2");
-        break;
-      case "f3":
-        robot.keyTap("f3");
-        break;
-      case "f4":
-        robot.keyTap("f4");
-        break;
-      case "f5":
-        robot.keyTap("f5");
-        break;
-      case "f6":
-        robot.keyTap("f6");
-        break;
-      case "f7":
-        robot.keyTap("f7");
-        break;
-      case "f8":
-        robot.keyTap("f8");
-        break;
-      case "f9":
-        robot.keyTap("f9");
-        break;
-      case "f10":
-        robot.keyTap("f10");
-        break;
-      case "f11":
-        robot.keyTap("f11");
-        break;
-      case "f12":
-        robot.keyTap("f12");
-        break;
-      case "numlock":
-        break;
-      case "pause":
-        robot.keyTap("pause");
-        break;
-      case "printscreen":
-        robot.keyTap("printscreen");
-        break;
-      case "windows":
-        robot.keyTap("meta"); // Windows key on macOS or equivalent
-        break;
-      case "arrowup":
-        robot.keyTap("up");
-        break;
-      case "arrowdown":
-        robot.keyTap("down"); 
-        break;
-      case "arrowleft":
-        robot.keyTap("left"); 
-        break;
-      case "arrowright":
-        robot.keyTap("right"); 
-        break;
-      case "scrolllock":
-        break;
+  //   switch (key) {
+  //     case "backspace":
+  //       robot.keyTap("backspace");
+  //       break;
+  //     case "enter":
+  //       robot.keyTap("enter");
+  //       break;
+  //     case "shift":
+  //       robot.keyTap("shift");
+  //       break;
+  //     case "ctrl":
+  //       robot.keyTap("control");
+  //       break;
+  //     case "alt":
+  //       robot.keyTap("alt");
+  //       break;
+  //     case "capslock":
+  //       robot.keyTap("capslock");
+  //       break;
+  //     case "space":
+  //       robot.keyTap("space");
+  //       break;
+  //     case "escape":
+  //       robot.keyTap("escape");
+  //       break;
+  //     case "tab":
+  //       robot.keyTap("tab");
+  //       break;
+  //     case "delete":
+  //       robot.keyTap("delete");
+  //       break;
+  //     case "insert":
+  //       robot.keyTap("insert");
+  //       break;
+  //     case "home":
+  //       robot.keyTap("home");
+  //       break;
+  //     case "end":
+  //       robot.keyTap("end");
+  //       break;
+  //     case "pageup":
+  //       robot.keyTap("pageup");
+  //       break;
+  //     case "pagedown":
+  //       robot.keyTap("pagedown");
+  //       break;
+  //     case "f1":
+  //       robot.keyTap("f1");
+  //       break;
+  //     case "f2":
+  //       robot.keyTap("f2");
+  //       break;
+  //     case "f3":
+  //       robot.keyTap("f3");
+  //       break;
+  //     case "f4":
+  //       robot.keyTap("f4");
+  //       break;
+  //     case "f5":
+  //       robot.keyTap("f5");
+  //       break;
+  //     case "f6":
+  //       robot.keyTap("f6");
+  //       break;
+  //     case "f7":
+  //       robot.keyTap("f7");
+  //       break;
+  //     case "f8":
+  //       robot.keyTap("f8");
+  //       break;
+  //     case "f9":
+  //       robot.keyTap("f9");
+  //       break;
+  //     case "f10":
+  //       robot.keyTap("f10");
+  //       break;
+  //     case "f11":
+  //       robot.keyTap("f11");
+  //       break;
+  //     case "f12":
+  //       robot.keyTap("f12");
+  //       break;
+  //     case "numlock":
+  //       break;
+  //     case "pause":
+  //       robot.keyTap("pause");
+  //       break;
+  //     case "printscreen":
+  //       robot.keyTap("printscreen");
+  //       break;
+  //     case "windows":
+  //       robot.keyTap("meta"); // Windows key on macOS or equivalent
+  //       break;
+  //     case "arrowup":
+  //       robot.keyTap("up");
+  //       break;
+  //     case "arrowdown":
+  //       robot.keyTap("down");
+  //       break;
+  //     case "arrowleft":
+  //       robot.keyTap("left");
+  //       break;
+  //     case "arrowright":
+  //       robot.keyTap("right");
+  //       break;
+  //     case "scrolllock":
+  //       break;
 
-      default:
-        try {
-          robot.keyTap(key.toString()); // For regular alphanumeric keys
-        } catch (error) {
-          console.log("Error: " + error);
-        }
+  //     default:
+  //       try {
+  //         robot.keyTap(key.toString()); // For regular alphanumeric keys
+  //       } catch (error) {
+  //         console.log("Error: " + error);
+  //       }
+  //   }
+  // });
+
+  socket.on("type", (data) => {
+    try {
+      const obj = JSON.parse(data);
+      const { key, type } = obj;
+
+      if (type === "keydown") {
+        console.log(`Key down: ${key}`);
+        robot.keyToggle(key, "down");
+      } else if (type === "keyup") {
+        console.log(`Key up: ${key}`);
+        robot.keyToggle(key, "up");
+      }
+    } catch (err) {
+      console.error("Error parsing socket data in type event:", err.message);
     }
   });
 };
