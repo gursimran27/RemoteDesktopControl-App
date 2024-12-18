@@ -15,8 +15,9 @@
       }
 
       img {
-        width: 90vw;
-        height: 90vh;
+        display: none;
+        width: 95vw;
+        height: 95vh;
         /* width: 1400px; */
         /* height: 640px; */
         border: 1px solid white;
@@ -25,9 +26,39 @@
         /* object-fit: fill; */
         user-select: none;
       }
+
+      .custom-loader {
+        width: 100px;
+        height: 100px;
+        display: grid;
+      }
+      .custom-loader::before,
+      .custom-loader::after {
+        content: "";
+        grid-area: 1/1;
+        --c: radial-gradient(farthest-side, #766df4 92%, #0000);
+        background: var(--c) 50% 0, var(--c) 50% 100%, var(--c) 100% 50%,
+          var(--c) 0 50%;
+        background-size: 24px 24px;
+        background-repeat: no-repeat;
+        animation: s2 1s infinite;
+      }
+      .custom-loader::before {
+        margin: 8px;
+        filter: hue-rotate(45deg);
+        background-size: 16px 16px;
+        animation-timing-function: linear;
+      }
+
+      @keyframes s2 {
+        100% {
+          transform: rotate(0.5turn);
+        }
+      }
     </style>
   </head>
   <body>
+    <div class="custom-loader"></div>
     <img draggable="false" />
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -59,6 +90,8 @@
 
         socket.emit("join-message", room);
         socket.on("screen-data", function (imgStr, remoteScreenSize) {
+          $(".custom-loader").hide();
+          $("img").show();
           $("img").attr("src", "data:image/png;base64," + imgStr); //this is jQuery
           if (remoteUserScreenSize === null) {
             remoteUserScreenSize = remoteScreenSize;
